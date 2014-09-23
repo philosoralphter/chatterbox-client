@@ -28,6 +28,7 @@ body {
 
 #main ul {
     padding-left: 20px;
+    list-style-type: none;
 }
 
 #main .error {
@@ -44,6 +45,11 @@ body {
     font-size: 12px;
     color: green;
     line-height: 13px;
+}
+
+#roomSelect {
+    height:40px;
+    border: 2px solid #333;
 }
 
 form {

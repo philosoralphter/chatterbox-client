@@ -3,11 +3,11 @@
 var app = {
 
   messagesPerPage: 20,
-  server: 'https://api.parse.com/1/classes/chatterbox',
+  server: 'https://api.parse.com/1/classes/chatterbox/?order=-createdAt',
 
 
   init : function(){
-      setInterval(this.fetch, 1500);
+      setInterval(this.fetch, 2500);
   },
 
   Message : function(username, text, roomname){
@@ -21,7 +21,7 @@ var app = {
       url: app.server,
       type: 'GET',
       success: function(data){
-        app.displayMessages(data);
+        app.processMessages(data);
       },
       error: function(data, error, errorMsg){
         console.log('Failed to get messages:', data, error, errorMsg);
@@ -48,31 +48,50 @@ var app = {
 
   },
 
-  verifyMessages : function(string){
+  sanitizer : function(string){
     if(typeof string !=='string'){ return 'Not A Real String!!!!! UNPwned...';}
     var regEx = /<script>/ig;
     var sanitizedString = string.replace(regEx, 'unPwned' );
     return sanitizedString;
   },
 
-  displayMessages : function(response){
-    console.log('response' + response);
+  processMessages : function(response){
+    console.log(response);
+
     var messages = response.results;
     for (var i=0; i<this.messagesPerPage; i++){
-      var checkedString = this.verifyMessages(messages[i].text);
-      this.addMessage(checkedString);
 
+      var formattedTime = new Date(messages[i].createdAt).toLocaleTimeString();
+      var unPreppedMessage = '<li>['+formattedTime +'] <a class="userNameLink" href="#">'+ messages[i].username+'</a>: '+messages[i].text+'</li>';
+      var sanitizedMessage = this.sanitizer(unPreppedMessage);
+      this.addMessage(sanitizedMessage);
     }
   },
 
+  addFriend: function(userName){
+
+  },
+
   addMessage: function(message){
-    $('#chats').append('<li>'+message+'</li>');
+    $('#chats').append(message);
+    this.updateEventHandlers();
   },
 
   clearMessages : function(){
     $('#chats').empty();
-  }
+  },
 
+  addRoom : function (roomToAdd){
+    $('#roomSelect').append('<a href=#>'+roomToAdd+'</a>');
+  },
+
+  updateEventHandlers : function(){
+    //hook up username links to add friends
+    $('.userNameLink').on('click', function(){
+        var linkText = $(this).text();
+        this.addFriend(linkText);
+    });
+  }
 };
 
 app.init();
