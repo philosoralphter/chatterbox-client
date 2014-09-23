@@ -2,18 +2,31 @@
 
 var app = {
 
+  friends : [],
   messagesPerPage: 20,
   server: 'https://api.parse.com/1/classes/chatterbox/?order=-createdAt',
-
+  currentRoom: "lobby",
 
   init : function(){
-      setInterval(this.fetch, 2500);
+    setInterval(this.fetch, 2500);
+
+    $('form').off().on('submit', function(event){
+      event.preventDefault();
+      var text = $('#messageInput').val();
+      var msg = app.newMessage(window.username, text, app.currentRoom);
+      app.send(msg);
+      $('#messageInput').val('');
+    });
   },
 
-  Message : function(username, text, roomname){
-    this.username = username;
-    this.text = text;
-    this.roomname = roomname;
+  newMessage : function(username, text, roomname){
+
+    return {
+      username: username,
+      text: text,
+      roomname: roomname,
+
+    };
   },
 
   fetch : function(){
@@ -38,7 +51,7 @@ var app = {
       contentType: 'application/json',
       success: function (data) {
         console.log('chatterbox: Message sent');
-        this.fetch();
+        app.fetch();
       },
       error: function (data) {
         // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -56,20 +69,20 @@ var app = {
   },
 
   processMessages : function(response){
-    console.log(response);
-
     var messages = response.results;
-    for (var i=0; i<this.messagesPerPage; i++){
+    this.clearMessages();
+
+    for (var i=this.messagesPerPage; i>=0; i--){
 
       var formattedTime = new Date(messages[i].createdAt).toLocaleTimeString();
-      var unPreppedMessage = '<li>['+formattedTime +'] <a class="userNameLink" href="#">'+ messages[i].username+'</a>: '+messages[i].text+'</li>';
+      var unPreppedMessage = '<li>['+formattedTime +'] <a class="username" href="#">'+ messages[i].username+'</a>: '+messages[i].text+'</li>';
       var sanitizedMessage = this.sanitizer(unPreppedMessage);
       this.addMessage(sanitizedMessage);
     }
   },
 
   addFriend: function(userName){
-
+    this.friends.push(userName);
   },
 
   addMessage: function(message){
@@ -87,13 +100,18 @@ var app = {
 
   updateEventHandlers : function(){
     //hook up username links to add friends
-    $('.userNameLink').on('click', function(){
-        var linkText = $(this).text();
-        this.addFriend(linkText);
+    $('.username').off()
+      .on('click', function(){
+      var linkText = $(this).text();
+      app.addFriend(linkText);
     });
-  }
-};
 
-app.init();
+  }
+
+
+};
+$(document).ready(function (){
+  app.init();
+});
 
 
