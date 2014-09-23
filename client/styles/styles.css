@@ -1,18 +1,13 @@
 body {
-    background: #eee;
+    background: lime;
     text-align: center;
-    padding: 0 25px;
     font-family: arial, sans-serif;
 }
 
 #main {
-    width: 500px;
-    margin: auto;
     text-align: left;
-    background: white;
+    background: #25272F;
     padding: 50px 60px;
-    border: solid #ddd;
-    border-width: 0 1px 1px 1px;
 }
 
 #main h1 {
@@ -47,9 +42,36 @@ body {
     line-height: 13px;
 }
 
+#messages {
+    width: 800px;
+    height: 600px;
+    margin-right:10px;
+    float: left;
+    text-align: left;
+    background: #E1E1E1;
+    padding: 10px 20px;
+    border: solid #ddd;
+    border-width: 0 1px 1px 1px;
+    box-shadow: 1px 5px 15px #fff;
+    overflow:  auto;
+    scroll-to:bottom;
+}
+
 #roomSelect {
     height:40px;
     border: 2px solid #333;
+}
+
+#room {
+    width: 300px;
+    height: 600px;
+    float: left;
+    text-align: left;
+    background: #E1E1E1;
+    padding: 10px 20px;
+    border: solid #ddd;
+    border-width: 0 1px 1px 1px;
+    box-shadow: 2px 2px 20px #333;
 }
 
 form {
@@ -59,9 +81,10 @@ form {
 }
 
 form input[type=text] {
-    margin-right: 10px;
-    width: 70%;
-    font-size: 12px;
+    margin: 10px;
+    width: 800px;
+    height: 30px;
+    font-size: 16px;
     padding: 5px;
 }
 
