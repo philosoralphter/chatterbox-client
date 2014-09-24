@@ -21,18 +21,13 @@ var app = {
       app.send(msg);
       $('#messageInput').val('');
     });
-
-
-
   },
 
   newMessage : function(username, text, roomname){
-
     return {
       username: username,
       text: text,
       roomname: roomname,
-
     };
   },
 
@@ -43,6 +38,7 @@ var app = {
       success: function(data){
         app.getRooms(data);
         app.processMessages(data);
+        console.log('successful fetch');
       },
       error: function(data, error, errorMsg){
         console.log('Failed to get messages:', data, error, errorMsg);
@@ -80,13 +76,17 @@ var app = {
   processMessages : function(response){
     var messages = response.results;
     this.clearMessages();
-    for (var i=this.messagesPerPage; i>=0; i--){
+    var msgsOnScreen = 0;
+    var i=99;
+    while (msgsOnScreen < app.messagesPerPage && i>=0){
       if(app.currentRoom === messages[i].roomname){
-      var formattedTime = new Date(messages[i].createdAt).toLocaleTimeString();
-      var unPreppedMessage = '<li>['+_.escape(formattedTime) +'] <a class="username" href="#">'+ _.escape(messages[i].username)+'</a>: '+messages[i].text+'</li>';
-      var sanitizedMessage = this.sanitizer(unPreppedMessage);
-      this.addMessage(sanitizedMessage);
+        var formattedTime = new Date(messages[i].createdAt).toLocaleTimeString();
+        var unPreppedMessage = '<li>[ ' + formattedTime + ' ] <a class="username" href="#">'
+                                  + _.escape(messages[i].username) + '</a>: ' + _.escape(messages[i].text)+'</li>';
+        app.addMessage(unPreppedMessage);
+        msgsOnScreen++;
       }
+      i--;
     }
   },
 
@@ -102,7 +102,7 @@ var app = {
     $('#room').empty();
 
     _.each(app.rooms, function(room){
-      $('#room').append('<div><a class="roomLink" href="#">'+room+'</a></div>');
+      $('#room').append('<div><a class="roomLink" href="#">' + _.escape(room) + '</a></div>');
     });
   },
 
@@ -120,25 +120,27 @@ var app = {
   },
 
   addRoom : function (roomToAdd){
-    $('#roomSelect').append('<a href=#>'+roomToAdd+'</a>');
+    $('#roomSelect').append('<a href=#>' + _.escape(roomToAdd) + '</a>');
   },
 
   updateEventHandlers : function(){
     //hook up username links to add friends
     $('.username').off()
       .on('click', function(){
-      var linkText = $(this).text();
-      app.addFriend(linkText);
+        var linkText = $(this).text();
+        app.addFriend(linkText);
+        $(this).parent('li').toggleClass('friend');
+
     });
 
     //Hook up Chat room switching links
     $('.roomLink').off().on('click', function(event){
       event.preventDefault();
       var linkText = $(this).text();
+      var roomText = $('#test').text(linkText);
       app.currentRoom = linkText;
       app.clearMessages();
       app.fetch();
-
     });
 
   }
